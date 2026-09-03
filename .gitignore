@@ -1,0 +1,20 @@
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Carpetas que NO suben a GitHub
+FotosRendimiento/
+designInspo/
+
+# Archivos sensibles
+.env
+*.key
+*.pem
+
+# Logs generados por los scripts
+logs/
+*.log
+
+# Backups generados
+backups/
