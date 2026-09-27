@@ -174,7 +174,10 @@ function Get-OptiMaxSystemReport {
             $recommendations += "💡 Hay $freeSlots slots de RAM libres - Se puede ampliar memoria"
         }
 
-        if ($totalRAM -le 8.5 -and $totalRAM -ge 7.5) {
+        if ($totalRAM -lt 7.5) {
+            $recommendations += "💰 RECOMENDACIÓN: Ampliar a 8GB de RAM como mínimo (${totalRAM}GB es insuficiente para Windows 10/11)"
+        }
+        elseif ($totalRAM -le 8.5) {
             $recommendations += "💰 RECOMENDACIÓN: Ampliar de 8GB a 16GB de RAM (~\$25.000-35.000 CLP)"
         }
 

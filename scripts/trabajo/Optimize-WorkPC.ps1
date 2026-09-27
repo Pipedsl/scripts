@@ -140,7 +140,7 @@ Set-OptiMaxVisualPerformance -Perfil "Trabajo"
 $currentStep++
 Show-Progress -Step $currentStep -Total $totalSteps -Message "Configurando plan de energía..."
 . "$scriptRoot\..\comun\Set-PowerPlan.ps1"
-Set-OptiMaxPowerPlan -Perfil "Trabajo"
+$null = Set-OptiMaxPowerPlan -Perfil "Trabajo"
 
 # ══════════════════════════════════════════════════════════
 # RESUMEN FINAL
@@ -166,8 +166,29 @@ Write-Host "     2. Verificar que AnyDesk sigue funcionando" -ForegroundColor Da
 Write-Host "     3. Comprobar mejora en el Monitor de Recursos" -ForegroundColor DarkGray
 Write-Host ""
 Write-Host "  ⚡ Si el equipo sigue lento después de reiniciar:" -ForegroundColor Yellow
-Write-Host "     → Considerar ampliar RAM de 8GB a 16GB" -ForegroundColor Yellow
-Write-Host "     → Verificar si el disco es HDD (cambiar a SSD)" -ForegroundColor Yellow
+# Recomendaciones según el hardware real del equipo
+$ramGB = 0
+try {
+    $ramGB = [math]::Round(((Get-CimInstance -ClassName Win32_PhysicalMemory -ErrorAction Stop |
+        Measure-Object -Property Capacity -Sum).Sum) / 1GB)
+} catch {}
+if ($ramGB -gt 0 -and $ramGB -lt 8) {
+    Write-Host "     → Ampliar RAM de ${ramGB}GB a 8GB (lo mínimo recomendado hoy)" -ForegroundColor Yellow
+}
+elseif ($ramGB -ge 8 -and $ramGB -lt 16) {
+    Write-Host "     → Considerar ampliar RAM de ${ramGB}GB a 16GB" -ForegroundColor Yellow
+}
+
+$hasHDD = $false
+try {
+    $hasHDD = [bool](Get-PhysicalDisk -ErrorAction Stop | Where-Object { $_.MediaType -eq "HDD" })
+} catch {}
+if ($hasHDD) {
+    Write-Host "     → El disco es HDD: cambiarlo a SSD es la mejora más notoria" -ForegroundColor Yellow
+}
+else {
+    Write-Host "     → Verificar si el disco es HDD (cambiar a SSD)" -ForegroundColor Yellow
+}
 Write-Host ""
 Write-Host "  ════════════════════════════════════════════════════════════" -ForegroundColor Magenta
 Write-Host "  OptiMax Pro — Servicio Profesional de Optimización" -ForegroundColor DarkGray
