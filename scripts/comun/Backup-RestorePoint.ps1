@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     OptiMax Pro — Crear Punto de Restauración del Sistema
 .DESCRIPTION

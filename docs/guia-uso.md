@@ -54,14 +54,19 @@ Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 2. Pegarla en `C:\OptiMaxPro\` (o donde prefieras)
 
 ### Después de copiar (SIEMPRE)
-La **primera vez** que ejecutas scripts de PowerShell en un PC nuevo, Windows los bloquea por seguridad. Hay que desbloquearlos:
+La forma más fácil: **doble clic en `Iniciar-OptiMax.bat`** (raíz del proyecto). Se encarga de todo: pide Administrador, desbloquea los scripts y abre el menú.
+
+Si prefieres hacerlo a mano desde PowerShell (Administrador), en la carpeta del proyecto:
 
 ```powershell
-# Esto le dice a Windows: "confío en los scripts que yo descargué"
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+# 1. Quitar la marca "descargado de internet" a los scripts
+Get-ChildItem -Recurse -Filter *.ps1 | Unblock-File
+
+# 2. Ejecutar el launcher permitiendo scripts solo en esta ejecución
+powershell -ExecutionPolicy Bypass -File .\scripts\launcher\Start-Optimizer.ps1
 ```
 
-**¿Qué significa `RemoteSigned`?** Que Windows permitirá ejecutar scripts locales, pero los descargados de internet deben estar firmados. Es la opción más segura sin bloquear todo.
+**¿Por qué no basta con `Set-ExecutionPolicy RemoteSigned`?** `RemoteSigned` permite scripts locales, pero exige firma digital a los que vienen de internet. Los archivos de un ZIP descargado de GitHub quedan marcados como "de internet", así que siguen bloqueados con el error *"no está firmado digitalmente"*. `Unblock-File` quita esa marca.
 
 ---
 
@@ -558,14 +563,15 @@ Cada vez que ejecutas un módulo, se guarda un registro en la carpeta `logs/` (s
 
 ## Solución de Problemas
 
-### "No se puede ejecutar scripts en este sistema"
+### "No se puede ejecutar scripts en este sistema" / "no está firmado digitalmente"
 ```powershell
-# Solución:
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+# Solución rápida: doble clic en Iniciar-OptiMax.bat
 
-# Si eso no funciona (en PCs corporativos con políticas):
+# O a mano, en la carpeta del proyecto (PowerShell Admin):
+Get-ChildItem -Recurse -Filter *.ps1 | Unblock-File
 Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
-# Esto solo aplica a la sesión actual de PowerShell
+.\scripts\launcher\Start-Optimizer.ps1
+# Bypass -Scope Process solo aplica a la ventana actual de PowerShell
 ```
 
 ### "Acceso denegado" o "No tiene permisos"

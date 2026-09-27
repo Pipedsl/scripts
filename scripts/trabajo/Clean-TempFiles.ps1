@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     OptiMax Pro — Limpieza de Archivos Temporales
 .DESCRIPTION

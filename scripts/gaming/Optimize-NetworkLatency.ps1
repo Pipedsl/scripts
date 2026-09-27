@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     OptiMax Pro — Optimización de Latencia de Red para Gaming
 .DESCRIPTION

@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     OptiMax Pro — Optimización Completa para Gaming
 .DESCRIPTION
@@ -133,7 +133,7 @@ Set-OptiMaxVisualPerformance -Perfil "Gaming"
 $currentStep++
 Show-Progress -Step $currentStep -Total $totalSteps -Message "Activando Ultimate Performance..."
 . "$scriptRoot\..\comun\Set-PowerPlan.ps1"
-Set-OptiMaxPowerPlan -Perfil "Gaming"
+$null = Set-OptiMaxPowerPlan -Perfil "Gaming"
 
 # ══════════════════════════════════════════════════════════
 # RESUMEN FINAL

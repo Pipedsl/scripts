@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     OptiMax Pro — Launcher Interactivo Principal
 .DESCRIPTION
@@ -186,7 +186,7 @@ do {
             $pwrOption = Read-Host
             $pwrPerfil = if ($pwrOption -eq "2") { "Gaming" } else { "Trabajo" }
 
-            Set-OptiMaxPowerPlan -Perfil $pwrPerfil
+            $null = Set-OptiMaxPowerPlan -Perfil $pwrPerfil
             Wait-ForKeypress
         }
         "10" {

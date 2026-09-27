@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     OptiMax Pro — Configurar Plan de Energía
 .DESCRIPTION
@@ -124,8 +124,8 @@ if ($MyInvocation.InvocationName -ne '.') {
     $option = Read-Host "Opción (1/2)"
 
     switch ($option) {
-        "1" { Set-OptiMaxPowerPlan -Perfil "Trabajo" }
-        "2" { Set-OptiMaxPowerPlan -Perfil "Gaming" }
+        "1" { $null = Set-OptiMaxPowerPlan -Perfil "Trabajo" }
+        "2" { $null = Set-OptiMaxPowerPlan -Perfil "Gaming" }
         default { Write-Host "[✗] Opción no válida." -ForegroundColor Red }
     }
 }
