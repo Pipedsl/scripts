@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     OptiMax Pro — Configurar Plan de Energía
 .DESCRIPTION

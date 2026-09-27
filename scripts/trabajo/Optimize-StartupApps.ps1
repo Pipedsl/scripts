@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     OptiMax Pro — Gestión de Programas de Inicio
 .DESCRIPTION

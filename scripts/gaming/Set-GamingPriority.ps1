@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     OptiMax Pro — Prioridad CPU/GPU para Gaming
 .DESCRIPTION

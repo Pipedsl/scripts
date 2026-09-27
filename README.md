@@ -34,25 +34,31 @@ OptiMax Pro es una suite de scripts PowerShell modulares diseñada para **técni
 - PowerShell 5.1 o superior
 - **Ejecutar como Administrador**
 
-### Ejecución
+### Ejecución (recomendada) ⭐
+Doble clic en **`Iniciar-OptiMax.bat`** (en la raíz del proyecto).
+Pide permisos de Administrador, desbloquea los scripts descargados y abre el menú. No cambia la política de ejecución del sistema.
+
+> Si aparece "Windows protegió su PC" → **Más información** → **Ejecutar de todas formas**.
+
+### Ejecución manual desde PowerShell
 1. Abrir **PowerShell como Administrador**
 2. Navegar a la carpeta del proyecto:
    ```powershell
-   cd "C:\ruta\a\ScriptparaRendimientoWindows\scripts\launcher"
+   cd "C:\ruta\a\scripts-main"
    ```
-3. Si es la primera vez, permitir ejecución de scripts:
+3. Desbloquear los archivos (necesario si se descargó el ZIP) y ejecutar:
    ```powershell
-   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+   Get-ChildItem -Recurse -Filter *.ps1 | Unblock-File
+   powershell -ExecutionPolicy Bypass -File .\scripts\launcher\Start-Optimizer.ps1
    ```
-4. Ejecutar el launcher:
-   ```powershell
-   .\Start-Optimizer.ps1
-   ```
+
+> ⚠️ **Error "no está firmado digitalmente"**: pasa al descargar el ZIP de GitHub. Windows marca los archivos como "descargados de internet" y la política `RemoteSigned` los bloquea aunque la hayas activado. Se soluciona con `Unblock-File` (arriba) o usando `Iniciar-OptiMax.bat`.
 
 ## 🏗️ Estructura del Proyecto
 
 ```
 ScriptparaRendimientoWindows/
+├── Iniciar-OptiMax.bat                # 🖱️ Doble clic para ejecutar
 ├── scripts/
 │   ├── launcher/
 │   │   └── Start-Optimizer.ps1        # 🎯 PUNTO DE ENTRADA PRINCIPAL

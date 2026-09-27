@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     OptiMax Pro — Diagnóstico Completo del Sistema
 .DESCRIPTION

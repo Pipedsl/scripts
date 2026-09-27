@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     OptiMax Pro — Restaurar Configuración Original
 .DESCRIPTION

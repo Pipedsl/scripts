@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     OptiMax Pro — Optimizar Rendimiento Visual
 .DESCRIPTION

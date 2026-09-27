@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     OptiMax Pro — Optimización Completa para Trabajo
 .DESCRIPTION

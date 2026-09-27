@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     OptiMax Pro — Launcher Interactivo Principal
 .DESCRIPTION
