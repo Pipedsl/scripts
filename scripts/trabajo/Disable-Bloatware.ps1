@@ -190,28 +190,57 @@ function Disable-OptiMaxBloatware {
     }
 
     foreach ($appName in $appsToRemove) {
-        $app = Get-AppxPackage -Name $appName -AllUsers -ErrorAction SilentlyContinue
-        if ($app) {
-            try {
-                # Verificar que no está en la lista de protegidos
-                $isProtected = $false
-                foreach ($protected in $protectedApps) {
-                    if ($appName -like $protected) {
-                        $isProtected = $true
-                        break
-                    }
-                }
+        # Puede devolver varios paquetes (distintas versiones/usuarios): hay que procesarlos uno a uno
+        $packages = @(Get-AppxPackage -Name $appName -AllUsers -ErrorAction SilentlyContinue)
+        $provisioned = @(Get-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue |
+            Where-Object { $_.DisplayName -eq $appName })
+        if ($packages.Count -eq 0 -and $provisioned.Count -eq 0) { continue }
 
-                if (-not $isProtected) {
-                    Remove-AppxPackage -Package $app.PackageFullName -AllUsers -ErrorAction Stop
-                    Write-Host "[✓] Removido: $appName" -ForegroundColor Green
-                    $removed++
-                }
+        # Verificar que no está en la lista de protegidos
+        $isProtected = $false
+        foreach ($protected in $protectedApps) {
+            if ($appName -like $protected) {
+                $isProtected = $true
+                break
+            }
+        }
+        if ($isProtected) { continue }
+
+        $appErrors = @()
+        foreach ($pkg in $packages) {
+            try {
+                Remove-AppxPackage -Package $pkg.PackageFullName -AllUsers -ErrorAction Stop
             }
             catch {
-                Write-Host "[!] No se pudo remover: $appName" -ForegroundColor Yellow
-                $failed++
+                # En Windows 10 -AllUsers falla con algunas apps del sistema: reintentar para el usuario actual
+                try {
+                    Remove-AppxPackage -Package $pkg.PackageFullName -ErrorAction Stop
+                }
+                catch {
+                    $appErrors += $_.Exception.Message
+                }
             }
+        }
+
+        # Quitar la copia aprovisionada para que no se reinstale en usuarios nuevos
+        foreach ($prov in $provisioned) {
+            try {
+                Remove-AppxProvisionedPackage -Online -PackageName $prov.PackageName -ErrorAction Stop | Out-Null
+            }
+            catch {
+                $appErrors += $_.Exception.Message
+            }
+        }
+
+        if ($appErrors.Count -eq 0) {
+            Write-Host "[✓] Removido: $appName" -ForegroundColor Green
+            $removed++
+        }
+        else {
+            $reason = ($appErrors[0] -split "`r?`n")[0]
+            Write-Host "[!] No se pudo remover: $appName" -ForegroundColor Yellow
+            Write-Host "    Motivo: $reason" -ForegroundColor DarkGray
+            $failed++
         }
     }
 

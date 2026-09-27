@@ -160,10 +160,16 @@ function Optimize-OptiMaxStartupApps {
             }
         }
 
-        foreach ($pattern in $recommendedDisable) {
-            if ($app.Name -like $pattern -or $app.Command -like $pattern) {
-                $isRecommendedDisable = $true
-                break
+        # Las tareas internas de Windows (\Microsoft\...) nunca se recomiendan desactivar
+        # (ej: ClipESU gestiona la licencia de actualizaciones extendidas de Windows 10)
+        $isWindowsTask = $app.Source -eq "Task Scheduler" -and $app.Location -like "\Microsoft\*"
+
+        if (-not $isWindowsTask) {
+            foreach ($pattern in $recommendedDisable) {
+                if ($app.Name -like $pattern -or $app.Command -like $pattern) {
+                    $isRecommendedDisable = $true
+                    break
+                }
             }
         }
 
@@ -216,13 +222,14 @@ function Optimize-OptiMaxStartupApps {
                         $disabled++
                     }
                     elseif ($app.Source -eq "Task Scheduler") {
-                        Disable-ScheduledTask -TaskName $app.Name -ErrorAction Stop | Out-Null
+                        Disable-ScheduledTask -TaskName $app.Name -TaskPath $app.Location -ErrorAction Stop | Out-Null
                         Write-Host "[✓] Tarea desactivada: $($app.Name)" -ForegroundColor Green
                         $disabled++
                     }
                 }
                 catch {
                     Write-Host "[!] No se pudo desactivar: $($app.Name)" -ForegroundColor Yellow
+                    Write-Host "    Motivo: $(($_.Exception.Message -split "`r?`n")[0])" -ForegroundColor DarkGray
                 }
             }
 
