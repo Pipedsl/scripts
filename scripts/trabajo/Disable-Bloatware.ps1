@@ -190,11 +190,14 @@ function Disable-OptiMaxBloatware {
     }
 
     foreach ($appName in $appsToRemove) {
-        # Puede devolver varios paquetes (distintas versiones/usuarios): hay que procesarlos uno a uno
-        $packages = @(Get-AppxPackage -Name $appName -AllUsers -ErrorAction SilentlyContinue)
+        # Solo se considera instalada si la tiene el usuario actual o está aprovisionada.
+        # -AllUsers también lista restos de perfiles borrados cuya carpeta ya no existe
+        # ("The system cannot find the path specified"): esos no son errores reales.
+        $userPackages = @(Get-AppxPackage -Name $appName -ErrorAction SilentlyContinue)
         $provisioned = @(Get-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue |
             Where-Object { $_.DisplayName -eq $appName })
-        if ($packages.Count -eq 0 -and $provisioned.Count -eq 0) { continue }
+        if ($userPackages.Count -eq 0 -and $provisioned.Count -eq 0) { continue }
+        $allUserPackages = @(Get-AppxPackage -Name $appName -AllUsers -ErrorAction SilentlyContinue)
 
         # Verificar que no está en la lista de protegidos
         $isProtected = $false
@@ -207,18 +210,17 @@ function Disable-OptiMaxBloatware {
         if ($isProtected) { continue }
 
         $appErrors = @()
-        foreach ($pkg in $packages) {
+        # Intento para todos los usuarios (los fallos por restos de perfiles se ignoran)
+        foreach ($pkg in $allUserPackages) {
+            Remove-AppxPackage -Package $pkg.PackageFullName -AllUsers -ErrorAction SilentlyContinue
+        }
+        # Lo que siga instalado para el usuario actual se quita directamente
+        foreach ($pkg in @(Get-AppxPackage -Name $appName -ErrorAction SilentlyContinue)) {
             try {
-                Remove-AppxPackage -Package $pkg.PackageFullName -AllUsers -ErrorAction Stop
+                Remove-AppxPackage -Package $pkg.PackageFullName -ErrorAction Stop
             }
             catch {
-                # En Windows 10 -AllUsers falla con algunas apps del sistema: reintentar para el usuario actual
-                try {
-                    Remove-AppxPackage -Package $pkg.PackageFullName -ErrorAction Stop
-                }
-                catch {
-                    $appErrors += $_.Exception.Message
-                }
+                $appErrors += $_.Exception.Message
             }
         }
 
@@ -232,12 +234,17 @@ function Disable-OptiMaxBloatware {
             }
         }
 
-        if ($appErrors.Count -eq 0) {
+        # El resultado se decide por lo que realmente quedó instalado
+        $stillInstalled = @(Get-AppxPackage -Name $appName -ErrorAction SilentlyContinue).Count -gt 0
+        $stillProvisioned = @(Get-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue |
+            Where-Object { $_.DisplayName -eq $appName }).Count -gt 0
+
+        if (-not $stillInstalled -and -not $stillProvisioned) {
             Write-Host "[✓] Removido: $appName" -ForegroundColor Green
             $removed++
         }
         else {
-            $reason = ($appErrors[0] -split "`r?`n")[0]
+            $reason = if ($appErrors.Count -gt 0) { ($appErrors[0] -split "`r?`n")[0] } else { "sigue instalada tras el intento" }
             Write-Host "[!] No se pudo remover: $appName" -ForegroundColor Yellow
             Write-Host "    Motivo: $reason" -ForegroundColor DarkGray
             $failed++
