@@ -163,8 +163,10 @@ function Optimize-OptiMaxStartupApps {
         # Las tareas internas de Windows (\Microsoft\...) nunca se recomiendan desactivar
         # (ej: ClipESU gestiona la licencia de actualizaciones extendidas de Windows 10)
         $isWindowsTask = $app.Source -eq "Task Scheduler" -and $app.Location -like "\Microsoft\*"
+        # RunOnce: tareas de limpieza que se ejecutan una sola vez y se borran solas (no afectan el arranque)
+        $isRunOnce = $app.Source -eq "Registry" -and $app.Location -like "*\RunOnce"
 
-        if (-not $isWindowsTask) {
+        if (-not $isWindowsTask -and -not $isRunOnce) {
             foreach ($pattern in $recommendedDisable) {
                 if ($app.Name -like $pattern -or $app.Command -like $pattern) {
                     $isRecommendedDisable = $true

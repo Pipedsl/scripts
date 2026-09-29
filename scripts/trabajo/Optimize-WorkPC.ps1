@@ -186,9 +186,6 @@ try {
 if ($hasHDD) {
     Write-Host "     → El disco es HDD: cambiarlo a SSD es la mejora más notoria" -ForegroundColor Yellow
 }
-else {
-    Write-Host "     → Verificar si el disco es HDD (cambiar a SSD)" -ForegroundColor Yellow
-}
 Write-Host ""
 Write-Host "  ════════════════════════════════════════════════════════════" -ForegroundColor Magenta
 Write-Host "  OptiMax Pro — Servicio Profesional de Optimización" -ForegroundColor DarkGray
